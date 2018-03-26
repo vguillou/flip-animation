@@ -1,0 +1,56 @@
+{
+    "name": "flip-animation",
+    "version": "0.0.1",
+    "description": "A simple an small (3ko) implementation of Paul Lewis' Flip animation principle",
+    "main": "flip.js",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/vguillou/flip-animation.git"
+    },
+    "files": [
+        "dist",
+        "examples",
+        "src"
+    ],
+    "scripts": {
+        "clean": "rimraf dist",
+        "lint": "eslint src examples",
+        "format": "prettier --write \"src/**/*.js\"",
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "build:cjs": "cross-env FORMAT=cjs rollup src/flip.js -c",
+        "build:es": "cross-env FORMAT=es rollup src/flip.js -c",
+        "build:umd": "cross-env FORMAT=umd rollup src/flip.js -c -n Flip",
+        "build:iife": "cross-env FORMAT=iife rollup src/flip.js -c -n Flip",
+        "build:all": "npm run build:cjs && npm run build:es && npm run build:umd && npm run build:iife",
+        "build": "npm run clean && npm run format && npm run lint && cross-env npm run build:all && cross-env UGLY=true npm run build:all",
+        "dev": "cross-env SERVE=true FORMAT=iife rollup src/flip.js -c -n Flip --watch"
+    },
+    "keywords": [
+        "animation",
+        "flip",
+        "js",
+        "css",
+        "transition"
+    ],
+    "author": "Vincent Guillou",
+    "license": "MIT",
+    "devDependencies": {
+        "babel-core": "^6.26.0",
+        "babel-plugin-external-helpers": "^6.22.0",
+        "babel-preset-airbnb": "^2.4.0",
+        "babel-preset-env": "^1.6.1",
+        "cross-env": "^5.1.4",
+        "eslint": "^4.19.1",
+        "eslint-config-airbnb-base": "^12.1.0",
+        "eslint-config-prettier": "^2.9.0",
+        "eslint-plugin-import": "^2.9.0",
+        "prettier": "^1.11.1",
+        "rimraf": "^2.6.2",
+        "rollup": "^0.57.1",
+        "rollup-plugin-babel": "^3.0.3",
+        "rollup-plugin-node-resolve": "^3.3.0",
+        "rollup-plugin-serve": "^0.4.2",
+        "rollup-plugin-uglify": "^3.0.0"
+    },
+    "dependencies": {}
+}
