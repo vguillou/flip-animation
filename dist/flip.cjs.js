@@ -16,38 +16,52 @@ class ElementHelper {
     this.element = element;
   }
 
-  cleanTransition() {
-    this.element.style.transition = '';
+  getStyle(styleProp) {
+    return window.getComputedStyle(this.element).getPropertyValue(styleProp);
+  }
+
+  getStyles(styleProps) {
+    return styleProps.map(prop => this.getStyle(this.element, prop));
   }
 
   setStyle(styleProp, value) {
     this.element.style[Utils.snakeToCamel(styleProp)] = value;
   }
 
-  static getStyle(element, styleProp) {
-    return window.getComputedStyle(element).getPropertyValue(styleProp);
+  addClass(clazz) {
+    this.element.classList.add(clazz);
   }
 
-  static getStyles(element, styleProps) {
-    return styleProps.map(prop => this.getStyle(element, prop));
+  addEventListener(eventName, cb) {
+    this.element.addEventListener(eventName, cb);
   }
 
-  static measure(element, otherPropsToFlip) {
+  removeEventListener(eventName, cb) {
+    this.element.removeEventListener(eventName, cb);
+  }
+
+  measure(otherPropsToFlip) {
     return {
-      rect: element.getBoundingClientRect(),
-      opacity: ElementHelper.getStyle(element, 'opacity'),
-      others: ElementHelper.getStyles(element, otherPropsToFlip)
+      rect: this.element.getBoundingClientRect(),
+      opacity: this.getStyle('opacity'),
+      others: this.getStyles(otherPropsToFlip)
     };
   }
 
   static getTransition(properties, transitionDuration, transitionTimingFunction) {
     return properties.map(prop => `${prop} ${transitionDuration} ${transitionTimingFunction}`).join(',');
   }
+
+  static getTransform(translateX, translateY, scaleX, scaleY) {
+    const transforms = [];
+    if (translateX || translateY) transforms.push(`translate(${translateX}px,${translateY}px)`);
+    if (scaleX !== 1 || scaleY !== 1) transforms.push(`scale(${scaleX},${scaleY})`);
+    return transforms.join(' ');
+  }
 }
 
 class Flipper {
   constructor(element, toClass, otherPropsToFlip) {
-    this.element = element;
     this.helper = new ElementHelper(element);
     this.toClass = toClass;
     this.otherPropsToFlip = otherPropsToFlip ? [].concat(otherPropsToFlip) : [];
@@ -55,39 +69,52 @@ class Flipper {
 
   firstLastInvert() {
     // first
-    const first = ElementHelper.measure(this.element, this.otherPropsToFlip);
+    const first = this.helper.measure(this.otherPropsToFlip);
 
-    this.element.classList.add(this.toClass);
+    this.helper.addClass(this.toClass);
 
     // last
-    const last = ElementHelper.measure(this.element, this.otherPropsToFlip);
+    const last = this.helper.measure(this.otherPropsToFlip);
 
     // invert
-    this.invert = this.invert(first, last, this.otherPropsToFlip);
+    this.inverted = this.invert(first, last, this.otherPropsToFlip);
   }
 
   play(transitionDuration, transitionTimingFunction) {
-    // Switch on animations.
-    const transitionProps = ['transform'];
-    if (this.invert.hasOpacityChanged) transitionProps.push('opacity');
-    Flipper.forEachPropThatChanged(this.otherPropsToFlip, this.invert, prop => transitionProps.push(prop));
+    return new Promise(resolve => {
+      // For starters, lets check if we actually have anything to transition
+      const transitionProps = [];
+      if (this.inverted.hasTransformChanged) transitionProps.push('transform');
+      if (this.inverted.hasOpacityChanged) transitionProps.push('opacity');
+      Flipper.forEachPropThatChanged(this.otherPropsToFlip, this.inverted, prop => transitionProps.push(prop));
+      if (!transitionProps.length) {
+        resolve();
+        return;
+      }
 
-    this.element.style.transition = ElementHelper.getTransition(transitionProps, transitionDuration, transitionTimingFunction);
+      // Set the transition property to enable...well...the transition
+      this.helper.setStyle('transition', ElementHelper.getTransition(transitionProps, transitionDuration, transitionTimingFunction));
 
-    // Remove transform and opacity to trigger the transition towards the css class
-    this.element.style.transform = '';
-    if (this.invert.hasOpacityChanged) this.element.style.opacity = '';
-    Flipper.forEachPropThatChanged(this.otherPropsToFlip, this.invert, prop => this.helper.setStyle(prop, ''));
-  }
+      // Prepare cleanup and resolve after the transition
+      const transitionEndCallback = () => {
+        this.helper.removeEventListener('transitionend', transitionEndCallback);
+        this.helper.setStyle('transition', '');
+        resolve();
+      };
+      this.helper.addEventListener('transitionend', transitionEndCallback);
 
-  cleanTransition() {
-    this.helper.cleanTransition();
+      // Remove transform and opacity to trigger the transition towards the css class
+      if (this.inverted.hasTransformChanged) this.helper.setStyle('transform', '');
+      if (this.inverted.hasOpacityChanged) this.helper.setStyle('opacity', '');
+      Flipper.forEachPropThatChanged(this.otherPropsToFlip, this.inverted, prop => this.helper.setStyle(prop, ''));
+    });
   }
 
   invert(first, last, otherPropsToFlip) {
-    const invert = {
-      translateX: (first.rect.left + first.rect.right) / 2 - (last.rect.left + last.rect.right) / 2,
-      translateY: (first.rect.top + first.rect.bottom) / 2 - (last.rect.top + last.rect.bottom) / 2,
+    // Calculate
+    const inverted = {
+      translateX: (first.rect.left + first.rect.right) / ((2 - (last.rect.left + last.rect.right)) / 2),
+      translateY: (first.rect.top + first.rect.bottom) / ((2 - (last.rect.top + last.rect.bottom)) / 2),
       scaleX: first.rect.width / last.rect.width,
       scaleY: first.rect.height / last.rect.height,
       hasOpacityChanged: first.opacity !== last.opacity,
@@ -95,35 +122,32 @@ class Flipper {
       hasOtherPropsToFlipChanged: first.others.map((firstOther, index) => firstOther !== last.others[index]),
       otherPropsToFlip: first.others
     };
+    inverted.transform = ElementHelper.getTransform(inverted.translateX, inverted.translateY, inverted.scaleX, inverted.scaleY);
+    inverted.hasTransformChanged = !!inverted.transform;
 
     // Invert
-    this.element.style.transform = `translate(${invert.translateX}px,${invert.translateY}px) scale(${invert.scaleX},${invert.scaleY})`;
-    if (invert.hasOpacityChanged) this.element.style.opacity = invert.opacity;
-    Flipper.forEachPropThatChanged(otherPropsToFlip, invert, (prop, index) => this.helper.setStyle(this.element, prop, invert.otherPropsToFlip[index]));
+    if (inverted.hasTransformChanged) this.helper.setStyle('transform', inverted.transform);
+    if (inverted.hasOpacityChanged) this.helper.setStyle('opacity', inverted.opacity);
+    Flipper.forEachPropThatChanged(otherPropsToFlip, inverted, (prop, index) => this.helper.setStyle(prop, inverted.otherPropsToFlip[index]));
 
     // return info about what has changed
-    return invert;
+    return inverted;
   }
 
-  static forEachPropThatChanged(props, invert, actionFn) {
+  static equals(first, second) {
+    return first.helper.element === second.helper.element && first.toClass === second.toClass;
+  }
+
+  static forEachPropThatChanged(props, inverted, actionFn) {
     props.forEach((p, index) => {
-      if (invert.hasOtherPropsToFlipChanged[index]) actionFn(p, index);
+      if (inverted.hasOtherPropsToFlipChanged[index]) actionFn(p, index);
     });
-  }
-
-  static transitionEndCallback(flipper, resolve) {
-    return () => {
-      flipper.element.removeEventListener('transitionend', Flipper.transitionEndCallback);
-      flipper.cleanTransition();
-      if (resolve) resolve();
-    };
   }
 }
 
 class Flip {
   constructor() {
-    this.flippers = [];
-    this.withTransition();
+    this.reset();
   }
 
   /**
@@ -140,17 +164,25 @@ class Flip {
 
   /**
    * Set the element that will transition, and the CSS to which it will transition to.
-   * @param {HTMLElement} element that will transition
+   * @param {HTMLElement or Array} elements that will transition
    * @param {String}} toClass CSS class to which the element will transition to
-   * @param {Array or String} otherPropsToFlip Optionnaly, the additionnal CSS properties
+   * @param {String or Array} otherPropsToFlip Optionnaly, the additionnal CSS properties
    * that should transition (other than 'opacity' and 'transform', in snake case)
    * @returns the instance of Flip
    * @throws {Error} if either 'element' or 'toClass' in not defined
    */
-  withClass(element, toClass, otherPropsToFlip = []) {
-    if (!element) throw new Error('element should be defined');
+  withClass(elements, toClass, otherPropsToFlip = []) {
+    if (!elements) throw new Error('elements should be defined');
     if (!toClass) throw new Error('toClass should be defined');
-    this.flippers.push(new Flipper(element, toClass, otherPropsToFlip));
+    if (this.ongoing) console.warn('withClass(): transition already ongoing');
+    const elementArray = [].concat(elements);
+    let newFlipper;
+    elementArray.forEach(element => {
+      newFlipper = new Flipper(element, toClass, otherPropsToFlip);
+      if (!this.flippers.some(currentFlipper => Flipper.equals(currentFlipper, newFlipper))) {
+        this.flippers.push(newFlipper);
+      }
+    });
     return this;
   }
 
@@ -160,17 +192,30 @@ class Flip {
    */
   go() {
     return new Promise(resolve => {
+      this.ongoing = true;
       // fli
       this.flippers.forEach(flipper => flipper.firstLastInvert());
       // p
       Utils.nextFrame(() => {
-        this.flippers.forEach((flipper, index) => {
-          flipper.element.addEventListener('transitionend', Flipper.transitionEndCallback(flipper, !index ? resolve : undefined));
-          flipper.play(this.transitionDuration, this.transitionTimingFunction);
+        const transitionPromises = this.flippers.map(flipper => flipper.play(this.transitionDuration, this.transitionTimingFunction));
+        Promise.all(transitionPromises).then(() => {
+          this.ongoing = false;
+          this.reset();
+          resolve();
         });
       });
-      if (!this.flippers.length) resolve();
     });
+  }
+
+  /**
+   * Reset everything (elements to transition, as well as transition settings).
+   * @returns the instance of Flip
+   */
+  reset() {
+    if (this.ongoing) console.warn('reset(): transition still ongoing');
+    this.flippers = [];
+    this.withTransition();
+    return this;
   }
 }
 

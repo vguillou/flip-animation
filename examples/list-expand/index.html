@@ -38,6 +38,10 @@
             height: 100vh;
             z-index: 999;
         }
+
+        .test {
+            opacity: 0.5;
+        }
     </style>
 </head>
 
@@ -79,20 +83,22 @@
     <script src="/flip.iife.js"></script>
 
     <script>
+        var Flip = new Flip();
+
         function doAnimate(event) {
-            var target = event.target;
-            if (target.classList.contains('card')) {
-                var flip = new Flip();
-                flip.withClass(target, 'expanded')
-                    .withTransition('500ms')
+            var targetElement = event.target;
+            if (targetElement.classList.contains('card')) {
+                Flip.withClass(targetElement, 'expanded')
+                    .withClass(document.querySelector('body'), 'test')
+                    .withTransition('5000ms')
                     .go()
                     .then(() => console.log('Animation finished!'));
             }
         }
 
         function reset() {
-            document.querySelectorAll('li > span.card').forEach(function (el) {
-                el.classList.remove('expanded');
+            document.querySelectorAll('li > span.card').forEach(function (element) {
+                element.classList.remove('expanded');
             })
         }
     </script>

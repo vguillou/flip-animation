@@ -22,6 +22,7 @@ const config = {
 };
 
 if (FORMAT !== 'es') {
+  console.log('Transpiling on');
   config.plugins.push(babel({ exclude: 'node_modules/**' })); // only transpile our source code
 }
 
