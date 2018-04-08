@@ -1,12 +1,10 @@
-class Utils {
-  static snakeToCamel(str) {
-    return str.replace(/(-\w)/g, (match) => match[1].toUpperCase());
-  }
+function snakeToCamel(str) {
+  return str.replace(/(-\w)/g, (match) => match[1].toUpperCase());
+}
 
-  static nextFrame(fn) {
-    // Twice because of firefox
-    requestAnimationFrame(() => requestAnimationFrame(fn));
-  }
+function nextFrame(fn) {
+  // Twice because of firefox
+  requestAnimationFrame(() => requestAnimationFrame(fn));
 }
 
 class ElementHelper {
@@ -23,7 +21,7 @@ class ElementHelper {
   }
 
   setStyle(styleProp, value) {
-    this.element.style[Utils.snakeToCamel(styleProp)] = value;
+    this.element.style[snakeToCamel(styleProp)] = value;
   }
 
   addClass(clazz) {
@@ -214,7 +212,7 @@ class Flip {
       // fli
       this.flippers.forEach((flipper) => flipper.firstLastInvert());
       // p
-      Utils.nextFrame(() => {
+      nextFrame(() => {
         const transitionPromises = this.flippers.map((flipper) =>
           flipper.play(this.transitionDuration, this.transitionTimingFunction),
         );
@@ -240,3 +238,4 @@ class Flip {
 }
 
 export default Flip;
+//# sourceMappingURL=flip.esm.js.map

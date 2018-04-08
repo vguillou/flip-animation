@@ -4,6 +4,19 @@
   (global.flip = factory());
 }(this, (function () { 'use strict';
 
+  function snakeToCamel(str) {
+    return str.replace(/(-\w)/g, function (match) {
+      return match[1].toUpperCase();
+    });
+  }
+
+  function nextFrame(fn) {
+    // Twice because of firefox
+    requestAnimationFrame(function () {
+      return requestAnimationFrame(fn);
+    });
+  }
+
   var classCallCheck = function (instance, Constructor) {
     if (!(instance instanceof Constructor)) {
       throw new TypeError("Cannot call a class as a function");
@@ -26,30 +39,6 @@
       if (staticProps) defineProperties(Constructor, staticProps);
       return Constructor;
     };
-  }();
-
-  var Utils = function () {
-    function Utils() {
-      classCallCheck(this, Utils);
-    }
-
-    createClass(Utils, null, [{
-      key: 'snakeToCamel',
-      value: function snakeToCamel(str) {
-        return str.replace(/(-\w)/g, function (match) {
-          return match[1].toUpperCase();
-        });
-      }
-    }, {
-      key: 'nextFrame',
-      value: function nextFrame(fn) {
-        // Twice because of firefox
-        requestAnimationFrame(function () {
-          return requestAnimationFrame(fn);
-        });
-      }
-    }]);
-    return Utils;
   }();
 
   var ElementHelper = function () {
@@ -76,7 +65,7 @@
     }, {
       key: 'setStyle',
       value: function setStyle(styleProp, value) {
-        this.element.style[Utils.snakeToCamel(styleProp)] = value;
+        this.element.style[snakeToCamel(styleProp)] = value;
       }
     }, {
       key: 'addClass',
@@ -147,14 +136,14 @@
     }, {
       key: 'play',
       value: function play(transitionDuration, transitionTimingFunction) {
-        var _this2 = this;
+        var _this = this;
 
         return new Promise(function (resolve) {
           // For starters, lets check if we actually have anything to transition
           var transitionProps = [];
-          if (_this2.inverted.hasTransformChanged) transitionProps.push('transform');
-          if (_this2.inverted.hasOpacityChanged) transitionProps.push('opacity');
-          Flipper.forEachPropThatChanged(_this2.otherPropsToFlip, _this2.inverted, function (prop) {
+          if (_this.inverted.hasTransformChanged) transitionProps.push('transform');
+          if (_this.inverted.hasOpacityChanged) transitionProps.push('opacity');
+          Flipper.forEachPropThatChanged(_this.otherPropsToFlip, _this.inverted, function (prop) {
             return transitionProps.push(prop);
           });
           if (!transitionProps.length) {
@@ -163,28 +152,28 @@
           }
 
           // Set the transition property to enable...well...the transition
-          _this2.helper.setStyle('transition', ElementHelper.getTransition(transitionProps, transitionDuration, transitionTimingFunction));
+          _this.helper.setStyle('transition', ElementHelper.getTransition(transitionProps, transitionDuration, transitionTimingFunction));
 
           // Prepare cleanup and resolve after the transition
           var transitionEndCallback = function transitionEndCallback() {
-            _this2.helper.removeEventListener('transitionend', transitionEndCallback);
-            _this2.helper.setStyle('transition', '');
+            _this.helper.removeEventListener('transitionend', transitionEndCallback);
+            _this.helper.setStyle('transition', '');
             resolve();
           };
-          _this2.helper.addEventListener('transitionend', transitionEndCallback);
+          _this.helper.addEventListener('transitionend', transitionEndCallback);
 
           // Remove transform and opacity to trigger the transition towards the css class
-          if (_this2.inverted.hasTransformChanged) _this2.helper.setStyle('transform', '');
-          if (_this2.inverted.hasOpacityChanged) _this2.helper.setStyle('opacity', '');
-          Flipper.forEachPropThatChanged(_this2.otherPropsToFlip, _this2.inverted, function (prop) {
-            return _this2.helper.setStyle(prop, '');
+          if (_this.inverted.hasTransformChanged) _this.helper.setStyle('transform', '');
+          if (_this.inverted.hasOpacityChanged) _this.helper.setStyle('opacity', '');
+          Flipper.forEachPropThatChanged(_this.otherPropsToFlip, _this.inverted, function (prop) {
+            return _this.helper.setStyle(prop, '');
           });
         });
       }
     }, {
       key: 'invert',
       value: function invert(first, last, otherPropsToFlip) {
-        var _this3 = this;
+        var _this2 = this;
 
         // Calculate
         var inverted = {
@@ -206,7 +195,7 @@
         if (inverted.hasTransformChanged) this.helper.setStyle('transform', inverted.transform);
         if (inverted.hasOpacityChanged) this.helper.setStyle('opacity', inverted.opacity);
         Flipper.forEachPropThatChanged(otherPropsToFlip, inverted, function (prop, index) {
-          return _this3.helper.setStyle(prop, inverted.otherPropsToFlip[index]);
+          return _this2.helper.setStyle(prop, inverted.otherPropsToFlip[index]);
         });
 
         // return info about what has changed
@@ -267,7 +256,7 @@
     }, {
       key: 'withClass',
       value: function withClass(elements, toClass) {
-        var _this4 = this;
+        var _this = this;
 
         var otherPropsToFlip = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [];
 
@@ -278,10 +267,10 @@
         var newFlipper = void 0;
         elementArray.forEach(function (element) {
           newFlipper = new Flipper(element, toClass, otherPropsToFlip);
-          if (!_this4.flippers.some(function (currentFlipper) {
+          if (!_this.flippers.some(function (currentFlipper) {
             return Flipper.equals(currentFlipper, newFlipper);
           })) {
-            _this4.flippers.push(newFlipper);
+            _this.flippers.push(newFlipper);
           }
         });
         return this;
@@ -295,22 +284,22 @@
     }, {
       key: 'go',
       value: function go() {
-        var _this5 = this;
+        var _this2 = this;
 
         return new Promise(function (resolve) {
-          _this5.ongoing = true;
+          _this2.ongoing = true;
           // fli
-          _this5.flippers.forEach(function (flipper) {
+          _this2.flippers.forEach(function (flipper) {
             return flipper.firstLastInvert();
           });
           // p
-          Utils.nextFrame(function () {
-            var transitionPromises = _this5.flippers.map(function (flipper) {
-              return flipper.play(_this5.transitionDuration, _this5.transitionTimingFunction);
+          nextFrame(function () {
+            var transitionPromises = _this2.flippers.map(function (flipper) {
+              return flipper.play(_this2.transitionDuration, _this2.transitionTimingFunction);
             });
             Promise.all(transitionPromises).then(function () {
-              _this5.ongoing = false;
-              _this5.reset();
+              _this2.ongoing = false;
+              _this2.reset();
               resolve();
             });
           });
@@ -337,3 +326,4 @@
   return Flip;
 
 })));
+//# sourceMappingURL=flip.js.map
