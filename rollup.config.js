@@ -12,6 +12,7 @@ const configUmd = {
     name: 'flip',
     file: PROD ? pkg.mainMin : pkg.main,
     format: 'umd',
+    sourcemap: !PROD,
   },
   plugins: [
     babel({
@@ -27,6 +28,7 @@ const configEsm = {
   output: {
     file: PROD ? pkg.moduleMin : pkg.module,
     format: 'es',
+    sourcemap: !PROD,
   },
   plugins: [PROD && uglify()],
 };
