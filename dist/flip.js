@@ -1,7 +1,7 @@
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
-  (global.flip = factory());
+  (global.Flip = factory());
 }(this, (function () { 'use strict';
 
   function snakeToCamel(str) {
@@ -177,8 +177,8 @@
 
         // Calculate
         var inverted = {
-          translateX: (first.rect.left + first.rect.right) / ((2 - (last.rect.left + last.rect.right)) / 2),
-          translateY: (first.rect.top + first.rect.bottom) / ((2 - (last.rect.top + last.rect.bottom)) / 2),
+          translateX: (first.rect.left + first.rect.right) / 2 - (last.rect.left + last.rect.right) / 2,
+          translateY: (first.rect.top + first.rect.bottom) / 2 - (last.rect.top + last.rect.bottom) / 2,
           scaleX: first.rect.width / last.rect.width,
           scaleY: first.rect.height / last.rect.height,
           hasOpacityChanged: first.opacity !== last.opacity,
@@ -217,6 +217,10 @@
     return Flipper;
   }();
 
+  /**
+   * A simple an small implementation of Paul Lewis' Flip animation principle.
+   */
+
   var Flip = function () {
     function Flip() {
       classCallCheck(this, Flip);
@@ -228,7 +232,7 @@
      * Set the properties of the transition
      * @param {String} duration as set in CSS (default is '375ms')
      * @param {String} timingFunction as set in CSS (default is 'cubic-bezier(0.4, 0.0, 0.2, 1)')
-     * @returns the instance of Flip
+     * @returns {Flip} the instance of Flip
      */
 
 
@@ -244,12 +248,12 @@
       }
 
       /**
-       * Set the element that will transition, and the CSS to which it will transition to.
-       * @param {HTMLElement or Array} elements that will transition
-       * @param {String}} toClass CSS class to which the element will transition to
-       * @param {String or Array} otherPropsToFlip Optionnaly, the additionnal CSS properties
+       * Set the element(s) that will transition, and the CSS to which it will transition to.
+       * @param {(HTMLElement|Array<HTMLElement>)} elements that will transition
+       * @param {String} toClass CSS class to which the element will transition to
+       * @param {(String|Array<String>)} otherPropsToFlip Optionnaly, the additionnal CSS properties
        * that should transition (other than 'opacity' and 'transform', in snake case)
-       * @returns the instance of Flip
+       * @returns {Flip} the instance of Flip
        * @throws {Error} if either 'element' or 'toClass' in not defined
        */
 
@@ -278,7 +282,7 @@
 
       /**
        * Triggers the transition.
-       * @returns A Promise that resolves after the transition ended.
+       * @returns {Promise} that resolves after the transition ended.
        */
 
     }, {
@@ -307,8 +311,8 @@
       }
 
       /**
-       * Reset everything (elements to transition, as well as transition settings).
-       * @returns the instance of Flip
+       * Resets everything (element(s) to transition, as well as transition settings).
+       * @returns {Flip} the instance of Flip
        */
 
     }, {

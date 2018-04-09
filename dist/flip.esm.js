@@ -118,10 +118,8 @@ class Flipper {
   invert(first, last, otherPropsToFlip) {
     // Calculate
     const inverted = {
-      translateX:
-        (first.rect.left + first.rect.right) / ((2 - (last.rect.left + last.rect.right)) / 2),
-      translateY:
-        (first.rect.top + first.rect.bottom) / ((2 - (last.rect.top + last.rect.bottom)) / 2),
+      translateX: (first.rect.left + first.rect.right) / 2 - (last.rect.left + last.rect.right) / 2,
+      translateY: (first.rect.top + first.rect.bottom) / 2 - (last.rect.top + last.rect.bottom) / 2,
       scaleX: first.rect.width / last.rect.width,
       scaleY: first.rect.height / last.rect.height,
       hasOpacityChanged: first.opacity !== last.opacity,
@@ -161,6 +159,9 @@ class Flipper {
   }
 }
 
+/**
+ * A simple an small implementation of Paul Lewis' Flip animation principle.
+ */
 class Flip {
   constructor() {
     this.reset();
@@ -170,7 +171,7 @@ class Flip {
    * Set the properties of the transition
    * @param {String} duration as set in CSS (default is '375ms')
    * @param {String} timingFunction as set in CSS (default is 'cubic-bezier(0.4, 0.0, 0.2, 1)')
-   * @returns the instance of Flip
+   * @returns {Flip} the instance of Flip
    */
   withTransition(duration = '375ms', timingFunction = 'cubic-bezier(0.4, 0.0, 0.2, 1)') {
     this.transitionDuration = duration || this.transitionDuration;
@@ -179,12 +180,12 @@ class Flip {
   }
 
   /**
-   * Set the element that will transition, and the CSS to which it will transition to.
-   * @param {HTMLElement or Array} elements that will transition
-   * @param {String}} toClass CSS class to which the element will transition to
-   * @param {String or Array} otherPropsToFlip Optionnaly, the additionnal CSS properties
+   * Set the element(s) that will transition, and the CSS to which it will transition to.
+   * @param {(HTMLElement|Array<HTMLElement>)} elements that will transition
+   * @param {String} toClass CSS class to which the element will transition to
+   * @param {(String|Array<String>)} otherPropsToFlip Optionnaly, the additionnal CSS properties
    * that should transition (other than 'opacity' and 'transform', in snake case)
-   * @returns the instance of Flip
+   * @returns {Flip} the instance of Flip
    * @throws {Error} if either 'element' or 'toClass' in not defined
    */
   withClass(elements, toClass, otherPropsToFlip = []) {
@@ -204,7 +205,7 @@ class Flip {
 
   /**
    * Triggers the transition.
-   * @returns A Promise that resolves after the transition ended.
+   * @returns {Promise} that resolves after the transition ended.
    */
   go() {
     return new Promise((resolve) => {
@@ -226,8 +227,8 @@ class Flip {
   }
 
   /**
-   * Reset everything (elements to transition, as well as transition settings).
-   * @returns the instance of Flip
+   * Resets everything (element(s) to transition, as well as transition settings).
+   * @returns {Flip} the instance of Flip
    */
   reset() {
     if (this.ongoing) console.warn('reset(): transition still ongoing');
