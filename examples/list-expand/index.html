@@ -3,6 +3,7 @@
 
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <meta charset="utf-8" />
     <style type="text/css">
         body {
             background: #e2e1e0;
@@ -37,10 +38,6 @@
             left: 0;
             height: 100vh;
             z-index: 999;
-        }
-
-        .test {
-            opacity: 0.5;
         }
     </style>
 </head>
@@ -80,17 +77,16 @@
     </ul>
     <button onclick="reset()" style="position: fixed; cursor: pointer; z-index: 99999; bottom: 10px; right: 10px; z-index: 9999;">Reset</button>
 
-    <script src="/flip.iife.js"></script>
+    <script src="/flip.js"></script>
 
     <script>
-        var Flip = new Flip();
+        var flip = new Flip();
 
         function doAnimate(event) {
             var targetElement = event.target;
             if (targetElement.classList.contains('card')) {
-                Flip.withClass(targetElement, 'expanded')
-                    .withClass(document.querySelector('body'), 'test')
-                    .withTransition('5000ms')
+                flip.withClass(targetElement, 'expanded')
+                    .withTransition('500ms')
                     .go()
                     .then(() => console.log('Animation finished!'));
             }
