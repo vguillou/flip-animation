@@ -1,43 +1,44 @@
-import resolve from 'rollup-plugin-node-resolve';
 import babel from 'rollup-plugin-babel';
 import uglify from 'rollup-plugin-uglify';
 import serve from 'rollup-plugin-serve';
+import pkg from './package.json';
 
-const { FORMAT } = process.env;
-const UGLY = process.env.UGLY === 'true';
-const SERVE = process.env.SERVE === 'true';
+const PROD = process.env.NODE_ENV === 'production';
+const DEV = process.env.NODE_ENV === 'development';
+const INPUT = 'src/index.js';
 
-const outputFileExtension = UGLY ? '.min' : '';
-
-const config = {
-  input: {
-    file: 'src/flip.js',
-  },
+// browser-friendly UMD build
+const configUmd = {
+  input: INPUT,
   output: {
-    file: `dist/flip.${FORMAT}${outputFileExtension}.js`,
-    format: FORMAT,
-    sourcemap: !UGLY,
+    name: 'Flip',
+    file: PROD ? pkg.mainMin : pkg.main,
+    format: 'umd',
+    sourcemap: !PROD,
   },
-  plugins: [resolve()],
+  plugins: [
+    babel({
+      exclude: 'node_modules/**',
+    }),
+    PROD && uglify(),
+    DEV &&
+      serve({
+        open: true,
+        contentBase: ['examples', 'dist'],
+        port: 10002,
+      }),
+  ],
 };
 
-if (FORMAT !== 'es') {
-  config.plugins.push(babel({ exclude: 'node_modules/**' })); // only transpile our source code
-}
+// ES6 module
+const configEsm = {
+  input: INPUT,
+  output: {
+    file: PROD ? pkg.moduleMin : pkg.module,
+    format: 'es',
+    sourcemap: !PROD,
+  },
+  plugins: [PROD && uglify()],
+};
 
-if (UGLY) {
-  config.plugins.push(uglify());
-}
-
-if (SERVE) {
-  config.plugins.concat([
-    serve({
-      open: true,
-      contentBase: ['examples', 'dist'],
-      host: 'localhost',
-      port: 10002,
-    }),
-  ]);
-}
-
-export default config;
+export default [configUmd, configEsm];

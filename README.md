@@ -1,6 +1,6 @@
 # flip-animation
 
-A simple an small (3ko) implementation of <a href="https://aerotwist.com/blog/flip-your-animations/">Paul Lewis' Flip animation principle</a>.
+A simple an small implementation of [Paul Lewis' Flip animation principle](https://aerotwist.com/blog/flip-your-animations/).
 
 ## Use it
 
@@ -10,9 +10,13 @@ A simple an small (3ko) implementation of <a href="https://aerotwist.com/blog/fl
         .go()
         .then(() => console.log('Animation finished!'));
 
+## API documentation
+
+[Markdown](https://github.com/vguillou/flip-animation/blob/master/docs/api.md) or [Web](https://vguillou.github.io/flip-animation/docs/).
+
 ## Try it
 
-Demos available <a href="https://vguillou.github.io/flip-animation/examples/">here</a>.
+Demos available [here](https://vguillou.github.io/flip-animation/examples/).
 
 ## Dependencies
 
@@ -24,9 +28,9 @@ None
 * (Recommended) Change the property "editor.tabSize" ("editor.tabSize": 2)
 * (Recommended) Download extensions: 'esbenp.prettier-vscode' and 'tombonnike.vscode-status-bar-format-toggle'. Restart. On the bottom right (status bar), activate 'Formatting'
 * Run 'npm install'
-* Run 'npm run build'
-* Run 'npm run dev' to serve the examples (<a href="http://localhost:10002">http://localhost:10002</a>)
+* Run 'npm run build' (or 'npm run build:prod')
+* Run 'npm run dev' to serve the examples ([http://localhost:10002](http://localhost:10002))
 
 ## License
 
-[MIT License](https://github.com/vguillou/flip-animation/blob/master/LICENSE.md)
+[MIT License](https://github.com/vguillou/flip-animation/blob/master/LICENSE)
