@@ -60,10 +60,8 @@ export default class Flipper {
   invert(first, last, otherPropsToFlip) {
     // Calculate
     const inverted = {
-      translateX:
-        (first.rect.left + first.rect.right) / ((2 - (last.rect.left + last.rect.right)) / 2),
-      translateY:
-        (first.rect.top + first.rect.bottom) / ((2 - (last.rect.top + last.rect.bottom)) / 2),
+      translateX: (first.rect.left + first.rect.right) / 2 - (last.rect.left + last.rect.right) / 2,
+      translateY: (first.rect.top + first.rect.bottom) / 2 - (last.rect.top + last.rect.bottom) / 2,
       scaleX: first.rect.width / last.rect.width,
       scaleY: first.rect.height / last.rect.height,
       hasOpacityChanged: first.opacity !== last.opacity,
