@@ -1,56 +1,48 @@
 {
-    "name": "flip-animation",
-    "version": "0.1.0",
-    "description": "A simple an small implementation of Paul Lewis' Flip animation principle",
-    "main": "dist/flip.js",
-    "mainMin": "dist/flip.min.js",
-    "module": "dist/flip.esm.js",
-    "moduleMin": "dist/flip.esm.min.js",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/vguillou/flip-animation.git"
-    },
-    "keywords": [
-        "animation",
-        "flip",
-        "js",
-        "css",
-        "transition"
-    ],
-    "author": "Vincent Guillou",
-    "license": "MIT",
-    "devDependencies": {
-        "babel-core": "^6.26.0",
-        "babel-plugin-external-helpers": "^6.22.0",
-        "babel-preset-env": "^1.6.1",
-        "cross-env": "^5.1.4",
-        "documentation": "^6.1.0",
-        "eslint": "^4.19.1",
-        "eslint-config-airbnb-base": "^12.1.0",
-        "eslint-config-prettier": "^2.9.0",
-        "eslint-plugin-import": "^2.10.0",
-        "prettier": "^1.11.1",
-        "rimraf": "^2.6.2",
-        "rollup": "^0.57.1",
-        "rollup-plugin-babel": "^3.0.3",
-        "rollup-plugin-serve": "^0.4.2",
-        "rollup-plugin-uglify": "^3.0.0"
-    },
-    "scripts": {
-        "clean": "rimraf dist && rimraf docs/*",
-        "lint": "eslint src examples",
-        "format": "prettier --write \"src/**/*.js\"",
-        "generate-docs": "npm run generate-docs:html && npm run generate-docs:md",
-        "generate-docs:html": "documentation build src/index.js -o docs -f html --document-exported",
-        "generate-docs:md": "documentation build src/index.js -o docs/api.md -f md --document-exported",
-        "package": "rollup -c",
-        "test": "echo \"Error: no test specified\" && exit 1",
-        "prebuild": "npm run clean && npm run format && npm run lint && npm run generate-docs",
-        "build": "npm run package",
-        "build:prod": "npm run package && cross-env NODE_ENV=production npm run package",
-        "dev": "cross-env NODE_ENV=development rollup -c -w"
-    },
-    "files": [
-        "dist"
-    ]
+  "name": "flip-animation",
+  "version": "0.1.0",
+  "description": "A simple an small implementation of Paul Lewis' Flip animation principle",
+  "main": "dist/flip.js",
+  "mainMin": "dist/flip.min.js",
+  "module": "dist/flip.esm.js",
+  "moduleMin": "dist/flip.esm.min.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vguillou/flip-animation.git"
+  },
+  "keywords": ["animation", "flip", "js", "css", "transition"],
+  "author": "Vincent Guillou",
+  "license": "MIT",
+  "devDependencies": {
+    "babel-core": "~6.26.0",
+    "babel-plugin-external-helpers": "~6.22.0",
+    "babel-preset-env": "~1.6.1",
+    "cross-env": "~5.1.4",
+    "documentation": "~6.1.0",
+    "eslint": "~4.19.1",
+    "eslint-config-airbnb-base": "~12.1.0",
+    "eslint-config-prettier": "~2.9.0",
+    "eslint-plugin-import": "~2.10.0",
+    "prettier": "~1.11.1",
+    "rimraf": "~2.6.2",
+    "rollup": "~0.57.1",
+    "rollup-plugin-babel": "~3.0.3",
+    "rollup-plugin-serve": "~0.4.2",
+    "rollup-plugin-uglify": "~3.0.0"
+  },
+  "scripts": {
+    "clean": "rimraf dist && rimraf docs/*",
+    "lint": "eslint src examples",
+    "format": "prettier --write \"src/**/*.js\"",
+    "generate-docs": "npm run generate-docs:html && npm run generate-docs:md",
+    "generate-docs:html": "documentation build src/index.js -o docs -f html --document-exported",
+    "generate-docs:md": "documentation build src/index.js -o docs/api.md -f md --document-exported",
+    "package": "rollup -c",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prebuild": "npm run clean && npm run format && npm run lint && npm run generate-docs",
+    "build": "npm run package",
+    "build:prod": "npm run package && cross-env NODE_ENV=production npm run package",
+    "dev": "cross-env NODE_ENV=development rollup -c -w"
+  },
+  "files": ["dist"]
 }
