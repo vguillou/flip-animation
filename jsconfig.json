@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "checkJs": true,
+    "allowSyntheticDefaultImports": true,
+    "noEmit": true,
+    "noImplicitAny": false,
+    "strictNullChecks": false,
+    "alwaysStrict": true,
+    "sourceMap": false
+  },
+  "exclude": ["bower_components", "ci", "dist", "docs", "node_modules", "**/node_modules/*"]
+}

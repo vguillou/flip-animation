@@ -10,7 +10,7 @@ export default class ElementHelper {
   }
 
   getStyles(styleProps) {
-    return styleProps.map((prop) => this.getStyle(this.element, prop));
+    return styleProps.map((prop) => this.getStyle(prop));
   }
 
   setStyle(styleProp, value) {

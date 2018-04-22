@@ -4,5 +4,5 @@ export function snakeToCamel(str) {
 
 export function nextFrame(fn) {
   // Twice because of firefox
-  requestAnimationFrame(() => requestAnimationFrame(fn));
+  requestAnimationFrame(() => requestAnimationFrame(() => fn()));
 }
