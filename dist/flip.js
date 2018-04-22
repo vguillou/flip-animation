@@ -4,16 +4,26 @@
   (global.Flip = factory());
 }(this, (function () { 'use strict';
 
+  /**
+   * Converts a snake-case String to camel-case
+   * @param {string} str String to convert to camel case
+   */
   function snakeToCamel(str) {
     return str.replace(/(-\w)/g, function (match) {
       return match[1].toUpperCase();
     });
   }
 
+  /**
+   * Calls a function after the next frame on all browsers.
+   * @param {Function} fn Function to call after the next frame
+   */
   function nextFrame(fn) {
     // Twice because of firefox
     requestAnimationFrame(function () {
-      return requestAnimationFrame(fn);
+      return requestAnimationFrame(function () {
+        return fn();
+      });
     });
   }
 
@@ -59,7 +69,7 @@
         var _this = this;
 
         return styleProps.map(function (prop) {
-          return _this.getStyle(_this.element, prop);
+          return _this.getStyle(prop);
         });
       }
     }, {

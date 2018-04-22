@@ -1,10 +1,18 @@
+/**
+ * Converts a snake-case String to camel-case
+ * @param {string} str String to convert to camel case
+ */
 function snakeToCamel(str) {
   return str.replace(/(-\w)/g, (match) => match[1].toUpperCase());
 }
 
+/**
+ * Calls a function after the next frame on all browsers.
+ * @param {Function} fn Function to call after the next frame
+ */
 function nextFrame(fn) {
   // Twice because of firefox
-  requestAnimationFrame(() => requestAnimationFrame(fn));
+  requestAnimationFrame(() => requestAnimationFrame(() => fn()));
 }
 
 class ElementHelper {
@@ -17,7 +25,7 @@ class ElementHelper {
   }
 
   getStyles(styleProps) {
-    return styleProps.map((prop) => this.getStyle(this.element, prop));
+    return styleProps.map((prop) => this.getStyle(prop));
   }
 
   setStyle(styleProp, value) {
